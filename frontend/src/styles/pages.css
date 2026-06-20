@@ -1,0 +1,183 @@
+/* ===================== Auth pages ===================== */
+.auth-wrap {
+  min-height: calc(100vh - 140px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6) var(--space-4);
+}
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-7) var(--space-6);
+  box-shadow: var(--shadow-md);
+}
+.auth-card h1 { font-size: 1.5rem; }
+.auth-switch {
+  text-align: center;
+  margin-top: var(--space-5);
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+}
+.auth-switch a { color: var(--color-primary); font-weight: 600; }
+.auth-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-accent-dark);
+  background: var(--color-accent-light);
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-bottom: var(--space-4);
+}
+
+/* ===================== Section headers ===================== */
+.section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+  flex-wrap: wrap;
+}
+.section-head p { margin: 0; }
+
+/* ===================== Booking page (customer dashboard) ===================== */
+.booking-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: var(--space-6);
+  align-items: start;
+}
+@media (max-width: 960px) {
+  .booking-layout { grid-template-columns: 1fr; }
+}
+.service-pick {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  margin-bottom: var(--space-3);
+  transition: border-color 0.12s ease, background-color 0.12s ease;
+}
+.service-pick:hover { border-color: var(--color-primary); }
+.service-pick.selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+.service-pick .pick-icon { font-size: 1.3rem; }
+.service-pick .pick-info { flex: 1; }
+.service-pick .pick-price { font-family: var(--font-mono); font-weight: 600; color: var(--color-primary); }
+
+.slot-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-2);
+}
+.slot-btn {
+  padding: 9px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  text-align: center;
+}
+.slot-btn:hover { border-color: var(--color-primary); }
+.slot-btn.selected {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+.summary-box {
+  position: sticky;
+  top: 90px;
+  padding: var(--space-5);
+}
+.summary-box .summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  padding: var(--space-2) 0;
+  border-bottom: 1px dashed var(--color-border);
+}
+.summary-box .summary-row:last-of-type { border-bottom: none; }
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: var(--space-4) 0;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-primary);
+}
+
+/* ===================== Admin layout ===================== */
+.admin-layout {
+  display: grid;
+  grid-template-columns: 230px 1fr;
+  min-height: calc(100vh - 140px);
+}
+.admin-sidebar {
+  background: var(--color-primary-dark);
+  color: rgba(255, 255, 255, 0.85);
+  padding: var(--space-5) var(--space-4);
+}
+.admin-sidebar .admin-brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: var(--space-6);
+  font-size: 1.05rem;
+}
+.admin-nav a {
+  display: block;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  margin-bottom: 4px;
+  color: rgba(255, 255, 255, 0.75);
+}
+.admin-nav a:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+.admin-nav a.active {
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 600;
+}
+.admin-content {
+  padding: var(--space-6);
+  background: var(--color-bg);
+  min-width: 0;
+}
+@media (max-width: 840px) {
+  .admin-layout { grid-template-columns: 1fr; }
+  .admin-sidebar {
+    display: flex;
+    overflow-x: auto;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+  }
+  .admin-sidebar .admin-brand { display: none; }
+  .admin-nav { display: flex; gap: var(--space-2); }
+  .admin-nav a { white-space: nowrap; margin-bottom: 0; }
+}
+
+/* ===================== Admin table-ish list wrapper ===================== */
+.list-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
