@@ -3,7 +3,7 @@ import axios from 'axios';
 // Base URL comes from the .env file (VITE_API_URL). Falls back to the
 // standard local dev backend address if it isn't set.
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseURL: 'https://vehicle-management-system-w67t.onrender.com/api',
 });
 
 // Attach the JWT (if we have one) to every outgoing request.

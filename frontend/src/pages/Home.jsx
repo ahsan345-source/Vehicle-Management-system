@@ -47,11 +47,22 @@ export default function Home() {
 
   return (
     <>
-      <section className="hero">
+      {/* ===================== UPDATED HERO SECTION WITH BACKGROUND IMAGE ===================== */}
+      <section 
+        className="hero"
+        style={{
+          backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url('/hero.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          padding: "var(--space-6) 0",
+          color: "white" // Text ko clear dikhane ke liye white color ensure kiya
+        }}
+      >
         <div className="container hero-inner">
-          <div className="hero-eyebrow">Workshop Booking, Simplified</div>
+          <div className="hero-eyebrow" style={{ color: "var(--color-accent, #ea580c)" }}>Workshop Booking, Simplified</div>
           <h1>Get your vehicle serviced without the waiting-room hassle.</h1>
-          <p>
+          <p style={{ color: "#e0e0e0" }}>
             Browse our six core services, pick a date and time that works for you, and pay only
             when the job is done — cash on delivery, no online payment needed.
           </p>
