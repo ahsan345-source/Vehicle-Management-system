@@ -1,18 +1,14 @@
-require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const connectDB = require('./config/db');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
-
 const authRoutes = require('./routes/authRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
 const workerRoutes = require('./routes/workerRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const reportRoutes = require('./routes/reportRoutes');
-// Baaqi routes ke bilkul niche yeh line add karein
 const reviewRoutes = require('./routes/reviewRoutes');
-
 connectDB();
 
 const app = express();
@@ -33,7 +29,8 @@ app.use('/api/services', serviceRoutes);
 app.use('/api/workers', workerRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/reports', reportRoutes);
-app.use('/api/reviews', reviewRoutes);
+app.use('/api/reviews', reviewRoutes);  // singular — worker's own portal
+app.use('/api/workers', workerRoutes);             // Admin waale operations ke liye
 // --- Error handling (must be last) ---
 app.use(notFound);
 app.use(errorHandler);
