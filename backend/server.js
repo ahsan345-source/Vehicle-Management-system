@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+require('dotenv').config();
 const morgan = require('morgan');
 const connectDB = require('./config/db');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
@@ -9,6 +10,8 @@ const workerRoutes = require('./routes/workerRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
+
+
 connectDB();
 
 const app = express();
@@ -19,7 +22,6 @@ app.use(express.json());
 if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
 }
-
 // --- Health check ---
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
@@ -30,7 +32,8 @@ app.use('/api/workers', workerRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/reviews', reviewRoutes);  // singular — worker's own portal
-app.use('/api/workers', workerRoutes);             // Admin waale operations ke liye
+app.use('/api/workers', workerRoutes); 
+app.use('/api/worker', workerRoutes);          // Admin waale operations ke liye
 // --- Error handling (must be last) ---
 app.use(notFound);
 app.use(errorHandler);

@@ -1,6 +1,120 @@
 const asyncHandler = require('express-async-handler');
 const Worker = require('../models/Worker');
 const Booking = require('../models/Booking');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET || 'your_jwt_secret_key', {
+    expiresIn: '30d',
+  });
+};
+const workerLogin = asyncHandler(async (req, res) => {
+  // Safe destructuring with client payload fallbacks
+  const email = req.body.email || req.body.form?.email;
+  const password = req.body.password || req.body.form?.password;
+
+  if (!email || !password) {
+    res.status(400);
+    throw new Error('Please add email and password parameters');
+  }
+
+  const worker = await Worker.findOne({ email });
+
+  if (!worker || !worker.password) {
+    res.status(401);
+    throw new Error('Worker profile not found or password field missing');
+  }
+
+  // Force-cast properties to explicit strings to completely avoid "string, undefined" exceptions
+  const isMatch = await bcrypt.compare(String(password), String(worker.password));
+
+  if (isMatch) {
+    res.json({
+      token: generateToken(worker._id),
+      worker: {
+        _id: worker._id,
+        name: worker.name,
+        email: worker.email,
+        expertise: worker.expertise,
+        availability: worker.availability || 'Available',
+      },
+    });
+  } else {
+    res.status(401);
+    throw new Error('Invalid worker email or password');
+  }
+});
+
+// @route    GET /api/worker/me
+// @access   Private/Worker
+const getWorkerProfile = asyncHandler(async (req, res) => {
+  const worker = await Worker.findById(req.user._id).select('-password');
+  if (!worker) {
+    res.status(404);
+    throw new Error('Worker profile not found');
+  }
+  res.json(worker);
+});
+
+// @route    PUT /api/worker/availability
+// @access   Private/Worker
+const updateWorkerAvailability = asyncHandler(async (req, res) => {
+  const { availability } = req.body;
+  
+  if (!availability) {
+    res.status(400);
+    throw new Error('Availability value is required');
+  }
+
+  const worker = await Worker.findById(req.user._id);
+  if (!worker) {
+    res.status(404);
+    throw new Error('Worker not found');
+  }
+
+  worker.availability = availability;
+  const updatedWorker = await worker.save();
+
+  res.json({
+    _id: updatedWorker._id,
+    name: updatedWorker.name,
+    email: updatedWorker.email,
+    expertise: updatedWorker.expertise,
+    availability: updatedWorker.availability,
+  });
+});
+
+// @route    PUT /api/worker/tasks/:id/status
+// @access   Private/Worker
+const updateTaskStatus = asyncHandler(async (req, res) => {
+  const { status } = req.body;
+  const validStatuses = ['In-Progress', 'On-Hold', 'Completed'];
+
+  if (!validStatuses.includes(status)) {
+    res.status(400);
+    throw new Error('Invalid task status');
+  }
+
+  const booking = await Booking.findById(req.params.id);
+  if (!booking) {
+    res.status(404);
+    throw new Error('Booking not found');
+  }
+
+  // Verification to protect tasks from cross-tenant modifications
+  if (booking.worker.toString() !== req.user._id.toString()) {
+    res.status(403);
+    throw new Error('Not authorized to update this task');
+  }
+
+  booking.status = status;
+  const updatedBooking = await booking.save();
+  res.json(updatedBooking);
+});
+
+// =========================================================================
+// 💼 EXISTING CONTROLLERS (UNTOUCHED & PRESERVED)
+// =========================================================================
 
 // @route   GET /api/workers
 // @access  Public
@@ -88,7 +202,12 @@ const getWorkerSchedule = asyncHandler(async (req, res) => {
     .populate('user', 'name phone')
     .sort({ date: 1 });
 
-  res.json({ worker, bookings });
+  // Dual-view capability support
+  if (!req.params.id && req.user) {
+    res.json(bookings);
+  } else {
+    res.json({ worker, bookings });
+  }
 });
 
 module.exports = {
@@ -98,4 +217,8 @@ module.exports = {
   updateWorker,
   deleteWorker,
   getWorkerSchedule,
+  workerLogin,
+  getWorkerProfile,
+  updateWorkerAvailability,
+  updateTaskStatus
 };

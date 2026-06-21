@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
+const dns = require('dns');
 
-/**
- * Connects to MongoDB using a direct local connection string.
- */
+// Node ko force karo Google DNS use kare SRV lookup ke liye
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+
 const connectDB = async () => {
   try {
-    // Wapis local path set kar diya
-    const conn = await mongoose.connect('mongodb://127.0.0.1:27017/vehicle-service');
+    const conn = await mongoose.connect(process.env.MONGO_URI);
     console.log(`MongoDB connected: ${conn.connection.host}`);
   } catch (error) {
     console.error(`MongoDB connection error: ${error.message}`);

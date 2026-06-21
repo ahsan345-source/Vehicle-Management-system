@@ -20,6 +20,18 @@ const createBooking = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error('Selected service is not available');
   }
+  let assignedWorkerId = null;
+  let isWorkerNotified = false;
+  const matchingWorker = await Worker.findOne({
+    expertise: { $regex: service.name, $options: 'i' }, // Case-insensitive matching
+    availability: 'Available'
+  });
+
+  if (matchingWorker) {
+    assignedWorkerId = matchingWorker._id;
+    isWorkerNotified = true; // Taaki worker ke schedule view mein foran show ho jaye
+  }
+  // =========================================================================
 
   const booking = await Booking.create({
     user: req.user._id,
@@ -31,6 +43,8 @@ const createBooking = asyncHandler(async (req, res) => {
     date,
     timeSlot,
     notes,
+    worker: assignedWorkerId,       // Links to the worker automatically if found
+    workerNotified: isWorkerNotified // Flips true to route into worker portal view
   });
 
   res.status(201).json(booking);
@@ -117,9 +131,6 @@ const getAllBookings = asyncHandler(async (req, res) => {
 
 // @route   PUT /api/bookings/:id/status
 // @access  Private/Admin
-// Approves/rejects/completes a booking, and optionally assigns a worker.
-// Assigning a worker flips workerNotified so the worker's schedule view
-// picks it up.
 const updateBookingStatus = asyncHandler(async (req, res) => {
   const { status, workerId } = req.body;
   const validStatuses = ['Pending', 'Approved', 'Rejected', 'Completed', 'Cancelled'];
