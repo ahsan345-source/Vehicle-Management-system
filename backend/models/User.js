@@ -9,12 +9,19 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
     email: {
-      type: String,
-      required: [true, 'Email is required'],
-      unique: true,
-      lowercase: true,
-      trim: true,
+  type: String,
+  required: [true, 'Email is required'],
+  unique: true,
+  lowercase: true,
+  trim: true,
+  validate: {
+    validator: function(v) {
+      // Sirf in domains ko accept karega backend
+      return /@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com)$/i.test(v);
     },
+    message: props => `${props.value} is not a valid email provider! Please use Gmail, Yahoo, Outlook, or Hotmail.`
+  }
+},
     password: {
       type: String,
       required: [true, 'Password is required'],

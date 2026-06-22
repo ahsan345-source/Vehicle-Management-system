@@ -43,6 +43,22 @@ export default function Navbar() {
             <button className="btn btn-outline btn-sm" onClick={handleLogout}>Logout</button>
           ) : (
             <>
+              {/* Cleanly added Admin Login link right next to standard Login button */}
+              <Link 
+                to="/login?role=admin" //  
+                className="admin-nav-link"
+                style={{ 
+                  fontSize: '13px', 
+                  color: '#6c757d', 
+                  textDecoration: 'none', 
+                  fontWeight: '500',
+                  marginRight: '8px'
+                }}
+                onMouseEnter={(e) => e.target.style.color = '#0f4c5c'}
+                onMouseLeave={(e) => e.target.style.color = '#6c757d'}
+              >
+                Admin Login
+              </Link>
               <Link to="/login" className="btn btn-outline btn-sm">Login</Link>
               <Link to="/register" className="btn btn-primary btn-sm">Sign Up</Link>
             </>

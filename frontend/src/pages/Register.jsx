@@ -11,7 +11,22 @@ export default function Register() {
   const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
 
+  // Allowed Email Domains ka Regex
+  const allowedDomains = /@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com)$/i;
+
+  if (!allowedDomains.test(form.email)) {
+    setError('Please enter a valid official email (Only Gmail, Yahoo, Outlook, or Hotmail are allowed).');
+    return; // Code aage nahi chalega aur request nahi jayegi
+  }
+
+  // Aapka baqi purana submit ka code yahan se start hoga...
+  setSubmitting(true);
+  // ...
+};
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');

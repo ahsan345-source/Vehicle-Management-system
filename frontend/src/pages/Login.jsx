@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // URL se parameters read karne ke liye hook add kiya
+  const [searchParams] = useSearchParams();
+  const isAdminRoute = searchParams.get('role') === 'admin';
 
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  
-  // New State: Password toggle handle karne ke liye
   const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -34,10 +36,18 @@ export default function Login() {
   return (
     <div className="auth-wrap">
       <div className="auth-card">
-        <span className="auth-tag">Welcome Back</span>
-        <h1>Log in to AutoCare</h1>
+        {/* Dynamic Tag based on URL */}
+        <span className="auth-tag" style={{ backgroundColor: isAdminRoute ? '#e6fffa' : '#ffe8cc', color: isAdminRoute ? '#006d77' : '#d9480f' }}>
+          {isAdminRoute ? 'Admin Control' : 'Welcome Back'}
+        </span>
+        
+        {/* Dynamic Heading based on URL */}
+        <h1>{isAdminRoute ? 'Log in to Admin Portal' : 'Log in to AutoCare'}</h1>
+        
         <p className="text-muted" style={{ marginBottom: 24 }}>
-          Customers and admins both sign in here — you'll land in the right place automatically.
+          {isAdminRoute 
+            ? 'Authorized personnel login only. Please enter your secure management credentials.' 
+            : "Customers and admins both sign in here — you'll land in the right place automatically."}
         </p>
 
         {error && <div className="form-error">{error}</div>}
@@ -50,7 +60,7 @@ export default function Login() {
               name="email"
               type="email"
               className="form-control"
-              placeholder="you@example.com"
+              placeholder={isAdminRoute ? "admin@autocare.com" : "you@example.com"}
               value={form.email}
               onChange={handleChange}
               required
@@ -60,7 +70,6 @@ export default function Login() {
           <div className="form-group">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <label htmlFor="password">Password</label>
-              {/* Feature 2: Forgot Password Link */}
               <Link 
                 to="/forgot-password" 
                 style={{ fontSize: '13px', color: '#0f4c5c', textDecoration: 'none', marginBottom: '5px' }}
@@ -71,17 +80,16 @@ export default function Login() {
               </Link>
             </div>
             
-            {/* Feature 1: Password Wrapper and View/Hide Toggle Button */}
             <div style={{ position: 'relative' }}>
               <input
                 id="password"
                 name="password"
-                type={showPassword ? "text" : "password"} // Dynamic Input Type Change
+                type={showPassword ? "text" : "password"}
                 className="form-control"
                 placeholder="••••••••"
                 value={form.password}
                 onChange={handleChange}
-                style={{ paddingRight: '50px' }} // Button ke liye space taaki text chhupay na
+                style={{ paddingRight: '50px' }}
                 required
               />
               <button
