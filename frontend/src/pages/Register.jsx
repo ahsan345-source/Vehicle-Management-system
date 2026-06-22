@@ -11,31 +11,27 @@ export default function Register() {
   const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError('');
 
-  // Allowed Email Domains ka Regex
-  const allowedDomains = /@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com)$/i;
-
-  if (!allowedDomains.test(form.email)) {
-    setError('Please enter a valid official email (Only Gmail, Yahoo, Outlook, or Hotmail are allowed).');
-    return; // Code aage nahi chalega aur request nahi jayegi
-  }
-
-  // Aapka baqi purana submit ka code yahan se start hoga...
-  setSubmitting(true);
-  // ...
-};
+  // Cleanly merged both handleSubmits into one single function
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
+    // 1. Allowed Email Domains ka Regex Check
+    const allowedDomains = /@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com)$/i;
+
+    if (!allowedDomains.test(form.email)) {
+      setError('Please enter a valid official email (Only Gmail, Yahoo, Outlook, or Hotmail are allowed).');
+      return; 
+    }
+
+    // 2. Password Length Check
     if (form.password.length < 6) {
       setError('Password must be at least 6 characters long');
       return;
     }
 
+    // 3. Form Submission Logic
     setSubmitting(true);
     try {
       await register(form);
