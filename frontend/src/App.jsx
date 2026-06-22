@@ -6,7 +6,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
-
+import ForgotPassword from './pages/ForgotPassword';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -51,7 +51,7 @@ export default function App() {
               </WorkerProtectedRoute>
             } 
           />
-
+<Route path="/forgot-password" element={<ForgotPassword />} />
           {/* Customer-only routes */}
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/my-bookings" element={<ProtectedRoute><BookingHistory /></ProtectedRoute>} />
