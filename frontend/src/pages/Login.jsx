@@ -10,6 +10,9 @@ export default function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  
+  // New State: Password toggle handle karne ke liye
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -53,19 +56,56 @@ export default function Login() {
               required
             />
           </div>
+          
           <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              className="form-control"
-              placeholder="••••••••"
-              value={form.password}
-              onChange={handleChange}
-              required
-            />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <label htmlFor="password">Password</label>
+              {/* Feature 2: Forgot Password Link */}
+              <Link 
+                to="/forgot-password" 
+                style={{ fontSize: '13px', color: '#0f4c5c', textDecoration: 'none', marginBottom: '5px' }}
+                onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
+                onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
+              >
+                Forgot Password?
+              </Link>
+            </div>
+            
+            {/* Feature 1: Password Wrapper and View/Hide Toggle Button */}
+            <div style={{ position: 'relative' }}>
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"} // Dynamic Input Type Change
+                className="form-control"
+                placeholder="••••••••"
+                value={form.password}
+                onChange={handleChange}
+                style={{ paddingRight: '50px' }} // Button ke liye space taaki text chhupay na
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  color: '#6c757d',
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  userSelect: 'none'
+                }}
+              >
+                {showPassword ? 'Hide' : 'Show'}
+              </button>
+            </div>
           </div>
+
           <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
             {submitting ? 'Logging in…' : 'Log In'}
           </button>

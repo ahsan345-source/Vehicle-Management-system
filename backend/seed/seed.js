@@ -1,7 +1,7 @@
 /**
- * Run with: npm run seed
+ * Run with: node seed/seed.js
  * Populates the database with the 6 required services and a default
- * admin account. Safe to re-run — it skips items that already exist.
+ * admin account. Clears old data first.
  */
 require('dotenv').config();
 const connectDB = require('../config/db');
@@ -66,26 +66,21 @@ const defaultWorkers = [
 const seed = async () => {
   await connectDB();
 
+  // Sabse pehle purani collections ko clean karein taaki duplicate na ho
+  console.log('Clearing old collections from the current database...');
+  await Service.deleteMany({});
+  await Worker.deleteMany({});
+
   // --- Services ---
   for (const service of defaultServices) {
-    const exists = await Service.findOne({ name: service.name });
-    if (!exists) {
-      await Service.create(service);
-      console.log(`Created service: ${service.name}`);
-    } else {
-      console.log(`Service already exists, skipped: ${service.name}`);
-    }
+    await Service.create(service);
+    console.log(`Created service: ${service.name}`);
   }
 
   // --- Workers ---
   for (const worker of defaultWorkers) {
-    const exists = await Worker.findOne({ name: worker.name });
-    if (!exists) {
-      await Worker.create(worker);
-      console.log(`Created worker: ${worker.name}`);
-    } else {
-      console.log(`Worker already exists, skipped: ${worker.name}`);
-    }
+    await Worker.create(worker);
+    console.log(`Created worker: ${worker.name}`);
   }
 
   // --- Admin account ---
@@ -104,7 +99,7 @@ const seed = async () => {
     console.log(`Admin account already exists, skipped: ${adminEmail}`);
   }
 
-  console.log('Seeding complete.');
+  console.log('Seeding complete successfully.');
   process.exit(0);
 };
 

@@ -37,6 +37,10 @@ app.use('/api/worker', workerRoutes);          // Admin waale operations ke liye
 // --- Error handling (must be last) ---
 app.use(notFound);
 app.use(errorHandler);
+// Is tarah ka code hoga use mita kar:
+// app.use(cors({ origin: process.env.CLIENT_URL }));
 
+// Yeh simple line likh den (is se har origin allow ho jayegi):
+app.use(cors());
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
