@@ -46,8 +46,8 @@ export default function Login() {
         
         <p className="text-muted" style={{ marginBottom: 24 }}>
           {isAdminRoute 
-            ? 'Authorized personnel login only. Please enter your secure management credentials.' 
-            : "Customers and admins both sign in here — you'll land in the right place automatically."}
+            ? 'Authorized person login only. Please enter your secure management credentials.' 
+            : "Customers sign in here — you'll land in the right place automatically."}
         </p>
 
         {error && <div className="form-error">{error}</div>}
