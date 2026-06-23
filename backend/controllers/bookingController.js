@@ -2,19 +2,13 @@ const asyncHandler = require('express-async-handler');
 const Booking = require('../models/Booking');
 const Service = require('../models/Service');
 const Worker = require('../models/Worker');
-
 const ACTIVE_STATUSES = ['Pending', 'Approved'];
-
-// @route   POST /api/bookings
-// @access  Private/User
 const createBooking = asyncHandler(async (req, res) => {
   const { serviceId, vehicleType, vehicleModel, date, timeSlot, notes } = req.body;
-
   if (!serviceId || !vehicleType || !date || !timeSlot) {
     res.status(400);
     throw new Error('Service, vehicle type, date and time slot are required');
   }
-
   const service = await Service.findById(serviceId);
   if (!service || !service.isActive) {
     res.status(404);
@@ -26,13 +20,10 @@ const createBooking = asyncHandler(async (req, res) => {
     expertise: { $regex: service.name, $options: 'i' }, // Case-insensitive matching
     availability: 'Available'
   });
-
   if (matchingWorker) {
     assignedWorkerId = matchingWorker._id;
-    isWorkerNotified = true; // Taaki worker ke schedule view mein foran show ho jaye
+    isWorkerNotified = true;
   }
-  // =========================================================================
-
   const booking = await Booking.create({
     user: req.user._id,
     service: service._id,
@@ -43,27 +34,20 @@ const createBooking = asyncHandler(async (req, res) => {
     date,
     timeSlot,
     notes,
-    worker: assignedWorkerId,       // Links to the worker automatically if found
-    workerNotified: isWorkerNotified // Flips true to route into worker portal view
+    worker: assignedWorkerId,  
+    workerNotified: isWorkerNotified 
   });
 
   res.status(201).json(booking);
 });
-
-// @route   GET /api/bookings/my
-// @access  Private/User
 const getMyBookings = asyncHandler(async (req, res) => {
   const bookings = await Booking.find({ user: req.user._id })
     .populate('worker', 'name expertise phone status')
     .sort({ createdAt: -1 });
   res.json(bookings);
 });
-
-// @route   PUT /api/bookings/:id/cancel
-// @access  Private/User
 const cancelBooking = asyncHandler(async (req, res) => {
   const booking = await Booking.findById(req.params.id);
-
   if (!booking) {
     res.status(404);
     throw new Error('Booking not found');
@@ -81,9 +65,6 @@ const cancelBooking = asyncHandler(async (req, res) => {
   const updated = await booking.save();
   res.json(updated);
 });
-
-// @route   PUT /api/bookings/:id/reschedule
-// @access  Private/User
 const rescheduleBooking = asyncHandler(async (req, res) => {
   const { date, timeSlot } = req.body;
 
@@ -109,14 +90,10 @@ const rescheduleBooking = asyncHandler(async (req, res) => {
 
   booking.date = date;
   booking.timeSlot = timeSlot;
-  // Rescheduled bookings go back to Pending so the admin re-confirms them
   booking.status = 'Pending';
   const updated = await booking.save();
   res.json(updated);
 });
-
-// @route   GET /api/bookings
-// @access  Private/Admin
 const getAllBookings = asyncHandler(async (req, res) => {
   const filter = {};
   if (req.query.status) filter.status = req.query.status;
@@ -128,9 +105,6 @@ const getAllBookings = asyncHandler(async (req, res) => {
 
   res.json(bookings);
 });
-
-// @route   PUT /api/bookings/:id/status
-// @access  Private/Admin
 const updateBookingStatus = asyncHandler(async (req, res) => {
   const { status, workerId } = req.body;
   const validStatuses = ['Pending', 'Approved', 'Rejected', 'Completed', 'Cancelled'];
@@ -156,7 +130,7 @@ const updateBookingStatus = asyncHandler(async (req, res) => {
       throw new Error('Worker not found');
     }
     booking.worker = worker._id;
-    booking.workerNotified = true; // routes the job to the worker's schedule view
+    booking.workerNotified = true;
   }
 
   const updated = await booking.save();

@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 const dns = require('dns');
-
-// Node ko force karo Google DNS use kare SRV lookup ke liye
 dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 const connectDB = async () => {
@@ -13,5 +11,4 @@ const connectDB = async () => {
     process.exit(1);
   }
 };
-
 module.exports = connectDB;

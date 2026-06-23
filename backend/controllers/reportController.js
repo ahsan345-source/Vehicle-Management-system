@@ -4,11 +4,6 @@ const Worker = require('../models/Worker');
 const Service = require('../models/Service');
 
 const ACTIVE_REVENUE_STATUSES = ['Pending', 'Approved'];
-
-// @route   GET /api/reports/summary
-// @access  Private/Admin
-// Returns the numbers the admin dashboard needs: totals, status
-// breakdown, revenue, and a simple per-service breakdown.
 const getSummary = asyncHandler(async (req, res) => {
   const bookings = await Booking.find();
 
@@ -18,13 +13,9 @@ const getSummary = asyncHandler(async (req, res) => {
     acc[b.status] = (acc[b.status] || 0) + 1;
     return acc;
   }, {});
-
-  // Revenue is counted from bookings that were actually carried out
   const revenueGenerated = bookings
     .filter((b) => b.status === 'Completed')
     .reduce((sum, b) => sum + b.priceSnapshot, 0);
-
-  // Revenue still pending collection (approved but not yet completed)
   const projectedRevenue = bookings
     .filter((b) => ACTIVE_REVENUE_STATUSES.includes(b.status))
     .reduce((sum, b) => sum + b.priceSnapshot, 0);
@@ -49,5 +40,4 @@ const getSummary = asyncHandler(async (req, res) => {
     totalServices,
   });
 });
-
 module.exports = { getSummary };

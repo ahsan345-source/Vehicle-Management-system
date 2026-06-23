@@ -9,7 +9,6 @@ const generateToken = (id) => {
   });
 };
 const workerLogin = asyncHandler(async (req, res) => {
-  // Safe destructuring with client payload fallbacks
   const email = req.body.email || req.body.form?.email;
   const password = req.body.password || req.body.form?.password;
 
@@ -24,8 +23,6 @@ const workerLogin = asyncHandler(async (req, res) => {
     res.status(401);
     throw new Error('Worker profile not found or password field missing');
   }
-
-  // Force-cast properties to explicit strings to completely avoid "string, undefined" exceptions
   const isMatch = await bcrypt.compare(String(password), String(worker.password));
 
   if (isMatch) {
@@ -44,9 +41,6 @@ const workerLogin = asyncHandler(async (req, res) => {
     throw new Error('Invalid worker email or password');
   }
 });
-
-// @route    GET /api/worker/me
-// @access   Private/Worker
 const getWorkerProfile = asyncHandler(async (req, res) => {
   const worker = await Worker.findById(req.user._id).select('-password');
   if (!worker) {
@@ -55,9 +49,6 @@ const getWorkerProfile = asyncHandler(async (req, res) => {
   }
   res.json(worker);
 });
-
-// @route    PUT /api/worker/availability
-// @access   Private/Worker
 const updateWorkerAvailability = asyncHandler(async (req, res) => {
   const { availability } = req.body;
   
@@ -83,9 +74,6 @@ const updateWorkerAvailability = asyncHandler(async (req, res) => {
     availability: updatedWorker.availability,
   });
 });
-
-// @route    PUT /api/worker/tasks/:id/status
-// @access   Private/Worker
 const updateTaskStatus = asyncHandler(async (req, res) => {
   const { status } = req.body;
   const validStatuses = ['In-Progress', 'On-Hold', 'Completed'];
@@ -100,8 +88,6 @@ const updateTaskStatus = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error('Booking not found');
   }
-
-  // Verification to protect tasks from cross-tenant modifications
   if (booking.worker.toString() !== req.user._id.toString()) {
     res.status(403);
     throw new Error('Not authorized to update this task');
@@ -111,21 +97,10 @@ const updateTaskStatus = asyncHandler(async (req, res) => {
   const updatedBooking = await booking.save();
   res.json(updatedBooking);
 });
-
-// =========================================================================
-// 💼 EXISTING CONTROLLERS (UNTOUCHED & PRESERVED)
-// =========================================================================
-
-// @route   GET /api/workers
-// @access  Public
-// Lets customers browse worker profiles (name + specialty) before/while booking.
 const getWorkers = asyncHandler(async (req, res) => {
   const workers = await Worker.find().sort({ createdAt: -1 });
   res.json(workers);
 });
-
-// @route   GET /api/workers/:id
-// @access  Public
 const getWorkerById = asyncHandler(async (req, res) => {
   const worker = await Worker.findById(req.params.id);
   if (!worker) {
@@ -134,9 +109,6 @@ const getWorkerById = asyncHandler(async (req, res) => {
   }
   res.json(worker);
 });
-
-// @route   POST /api/workers
-// @access  Private/Admin
 const createWorker = asyncHandler(async (req, res) => {
   const { name, expertise, phone, experienceYears, status } = req.body;
 
@@ -148,9 +120,6 @@ const createWorker = asyncHandler(async (req, res) => {
   const worker = await Worker.create({ name, expertise, phone, experienceYears, status });
   res.status(201).json(worker);
 });
-
-// @route   PUT /api/workers/:id
-// @access  Private/Admin
 const updateWorker = asyncHandler(async (req, res) => {
   const worker = await Worker.findById(req.params.id);
   if (!worker) {
@@ -168,29 +137,18 @@ const updateWorker = asyncHandler(async (req, res) => {
 
   const updated = await worker.save();
   res.json(updated);
-});
-
-// @route   DELETE /api/workers/:id
-// @access  Private/Admin
+})
 const deleteWorker = asyncHandler(async (req, res) => {
   const worker = await Worker.findById(req.params.id);
   if (!worker) {
     res.status(404);
     throw new Error('Worker not found');
   }
-
-  // Unassign this worker from any bookings rather than leaving dangling refs
   await Booking.updateMany({ worker: worker._id }, { $set: { worker: null, workerNotified: false } });
   await worker.deleteOne();
 
   res.json({ message: 'Worker removed successfully' });
 });
-
-// @route   GET /api/workers/:id/schedule
-// @access  Private/Admin
-// This is the "notification view" — since workers don't have a login
-// portal, the admin opens this screen to see/relay each worker's
-// upcoming assigned jobs.
 const getWorkerSchedule = asyncHandler(async (req, res) => {
   const worker = await Worker.findById(req.params.id);
   if (!worker) {
@@ -201,8 +159,6 @@ const getWorkerSchedule = asyncHandler(async (req, res) => {
   const bookings = await Booking.find({ worker: worker._id })
     .populate('user', 'name phone')
     .sort({ date: 1 });
-
-  // Dual-view capability support
   if (!req.params.id && req.user) {
     res.json(bookings);
   } else {
